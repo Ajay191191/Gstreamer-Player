@@ -1,0 +1,227 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<interface>
+  <requires lib="gtk+" version="2.24"/>
+  <!-- interface-naming-policy project-wide -->
+  <object class="GtkAdjustment" id="adjustment">
+    <property name="upper">100</property>
+    <property name="step_increment">1</property>
+    <property name="page_increment">5</property>
+  </object>
+  <object class="GtkWindow" id="window">
+    <property name="can_focus">False</property>
+    <signal name="destroy" handler="on_window_destroy" swapped="no"/>
+    <signal name="key-press-event" handler="key_press" swapped="no"/>
+    <child>
+      <object class="GtkHBox" id="hboxMain">
+        <property name="visible">True</property>
+        <property name="can_focus">False</property>
+        <child>
+          <object class="GtkVBox" id="vbox">
+            <property name="visible">True</property>
+            <property name="can_focus">False</property>
+            <child>
+              <object class="GtkMenuBar" id="menubar">
+                <property name="visible">True</property>
+                <property name="can_focus">False</property>
+                <child>
+                  <object class="GtkMenuItem" id="menuitemFile">
+                    <property name="visible">True</property>
+                    <property name="can_focus">False</property>
+                    <property name="resize_mode">immediate</property>
+                    <property name="use_action_appearance">False</property>
+                    <property name="label" translatable="yes">File</property>
+                    <child type="submenu">
+                      <object class="GtkMenu" id="menuFile">
+                        <property name="visible">True</property>
+                        <property name="can_focus">False</property>
+                        <child>
+                          <object class="GtkImageMenuItem" id="imagemenuitemOpen">
+                            <property name="label">gtk-open</property>
+                            <property name="visible">True</property>
+                            <property name="can_focus">False</property>
+                            <property name="use_action_appearance">False</property>
+                            <property name="use_underline">True</property>
+                            <property name="use_stock">True</property>
+                            <signal name="activate" handler="on_open_activate" swapped="no"/>
+                          </object>
+                        </child>
+                        <child>
+                          <object class="GtkImageMenuItem" id="imagemenuitemSaveAs">
+                            <property name="label">gtk-save-as</property>
+                            <property name="visible">True</property>
+                            <property name="can_focus">False</property>
+                            <property name="use_action_appearance">False</property>
+                            <property name="use_underline">True</property>
+                            <property name="use_stock">True</property>
+                          </object>
+                        </child>
+                        <child>
+                          <object class="GtkSeparatorMenuItem" id="separatormenuitem1">
+                            <property name="visible">True</property>
+                            <property name="can_focus">False</property>
+                            <property name="use_action_appearance">False</property>
+                          </object>
+                        </child>
+                        <child>
+                          <object class="GtkImageMenuItem" id="imagemenuitemQuit">
+                            <property name="label">gtk-quit</property>
+                            <property name="visible">True</property>
+                            <property name="can_focus">False</property>
+                            <property name="use_action_appearance">False</property>
+                            <property name="use_underline">True</property>
+                            <property name="use_stock">True</property>
+                            <signal name="activate" handler="on_window_destroy" swapped="no"/>
+                          </object>
+                        </child>
+                      </object>
+                    </child>
+                  </object>
+                </child>
+              </object>
+              <packing>
+                <property name="expand">False</property>
+                <property name="fill">True</property>
+                <property name="position">0</property>
+              </packing>
+            </child>
+            <child>
+              <object class="GtkDrawingArea" id="drawingarea">
+                <property name="width_request">640</property>
+                <property name="height_request">480</property>
+                <property name="visible">True</property>
+                <property name="can_focus">False</property>
+              </object>
+              <packing>
+                <property name="expand">True</property>
+                <property name="fill">True</property>
+                <property name="position">1</property>
+              </packing>
+            </child>
+            <child>
+              <object class="GtkVBox" id="vboxBottom">
+                <property name="visible">True</property>
+                <property name="can_focus">False</property>
+                <child>
+                  <object class="GtkHScale" id="hscale">
+                    <property name="visible">True</property>
+                    <property name="can_focus">True</property>
+                    <property name="adjustment">adjustment</property>
+                    <property name="round_digits">1</property>
+                    <signal name="change-value" handler="seek_cb" swapped="no"/>
+                  </object>
+                  <packing>
+                    <property name="expand">True</property>
+                    <property name="fill">True</property>
+                    <property name="position">0</property>
+                  </packing>
+                </child>
+                <child>
+                  <object class="GtkHBox" id="hboxToolbar">
+                    <property name="visible">True</property>
+                    <property name="can_focus">False</property>
+                    <child>
+                      <object class="GtkToolbar" id="toolbar">
+                        <property name="visible">True</property>
+                        <property name="can_focus">False</property>
+                        <child>
+                          <object class="GtkToolButton" id="toolbuttonPlay">
+                            <property name="visible">True</property>
+                            <property name="can_focus">False</property>
+                            <property name="use_action_appearance">False</property>
+                            <property name="label" translatable="yes">toolbuttonPlay</property>
+                            <property name="use_underline">True</property>
+                            <property name="stock_id">gtk-media-play</property>
+                            <signal name="clicked" handler="gst_play" swapped="no"/>
+                          </object>
+                          <packing>
+                            <property name="expand">False</property>
+                            <property name="homogeneous">True</property>
+                          </packing>
+                        </child>
+                        <child>
+                          <object class="GtkToolButton" id="toolbuttonPause">
+                            <property name="visible">True</property>
+                            <property name="can_focus">False</property>
+                            <property name="use_action_appearance">False</property>
+                            <property name="label" translatable="yes">toolbuttonPause</property>
+                            <property name="use_underline">True</property>
+                            <property name="stock_id">gtk-media-pause</property>
+                            <signal name="clicked" handler="gst_pause" swapped="no"/>
+                          </object>
+                          <packing>
+                            <property name="expand">False</property>
+                            <property name="homogeneous">True</property>
+                          </packing>
+                        </child>
+                        <child>
+                          <object class="GtkToolButton" id="toolbuttonStop">
+                            <property name="visible">True</property>
+                            <property name="can_focus">False</property>
+                            <property name="use_action_appearance">False</property>
+                            <property name="label" translatable="yes">toolbuttonStop</property>
+                            <property name="use_underline">True</property>
+                            <property name="stock_id">gtk-media-stop</property>
+                            <signal name="clicked" handler="gst_stop" swapped="no"/>
+                          </object>
+                          <packing>
+                            <property name="expand">False</property>
+                            <property name="homogeneous">True</property>
+                          </packing>
+                        </child>
+                      </object>
+                      <packing>
+                        <property name="expand">True</property>
+                        <property name="fill">True</property>
+                        <property name="position">0</property>
+                      </packing>
+                    </child>
+                    <child>
+                      <object class="GtkVolumeButton" id="volumebutton">
+                        <property name="visible">True</property>
+                        <property name="can_focus">True</property>
+                        <property name="receives_default">True</property>
+                        <property name="use_action_appearance">False</property>
+                        <property name="relief">none</property>
+                        <property name="focus_on_click">False</property>
+                        <property name="orientation">vertical</property>
+                        <property name="icons">audio-volume-muted
+audio-volume-high
+audio-volume-low
+audio-volume-medium</property>
+                        <signal name="realize" handler="setCurrentVol" swapped="no"/>
+                        <signal name="value-changed" handler="change_volume" swapped="no"/>
+                      </object>
+                      <packing>
+                        <property name="expand">False</property>
+                        <property name="fill">False</property>
+                        <property name="position">1</property>
+                      </packing>
+                    </child>
+                  </object>
+                  <packing>
+                    <property name="expand">True</property>
+                    <property name="fill">True</property>
+                    <property name="position">1</property>
+                  </packing>
+                </child>
+              </object>
+              <packing>
+                <property name="expand">True</property>
+                <property name="fill">True</property>
+                <property name="position">2</property>
+              </packing>
+            </child>
+          </object>
+          <packing>
+            <property name="expand">True</property>
+            <property name="fill">True</property>
+            <property name="position">0</property>
+          </packing>
+        </child>
+        <child>
+          <placeholder/>
+        </child>
+      </object>
+    </child>
+  </object>
+</interface>
