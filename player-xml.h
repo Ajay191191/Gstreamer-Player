@@ -31,7 +31,7 @@ GtkWidget *video_output;
 char *filename;
 
 //GstElement *pipeline,*videosink,*bin;
-GstElement *src, *dec, *conv, *sink, *typefind,*typefind2,*audioqueue,*videoqueue;
+GstElement *src, *dec, *conv, *sink, *typefind,*typefind2,*audioqueue,*videoqueue,*volume,*level;
 GstElement *convVid,*videosink,*videoRate,*capsFilter1,*videoScale,*capsFilter2;
 GstBus *bus;
 GstCaps *caps,*caps2;
@@ -55,8 +55,6 @@ void
 toggle_paused ();
 void
 change_volume(GtkScaleButton *button,gdouble value,gpointer data);	
-void 
-setCurrentVol(GtkWidget *widget,gpointer data);
 gboolean
 key_press (GtkWidget *widget,
            GdkEventKey *event,
@@ -89,5 +87,10 @@ guint64
 gst_query_position (void);
 static void
 cb_newpad (GstElement *decodebin,GstPad     *pad,gboolean    last, gpointer    data);
+gboolean refresh_ui(gpointer data);
+gulong seek_cb_signal;
+gboolean slider_button_press_cb(GtkWidget * widget, GdkEventButton * event, gpointer user_data);
+gboolean slider_button_release_cb(GtkWidget * widget, GdkEventButton * event, gpointer user_data);
+
 
 #endif /* PLAYER_XML_H */

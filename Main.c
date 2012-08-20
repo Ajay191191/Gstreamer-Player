@@ -39,15 +39,19 @@ main(int argc, char *argv[]) {
     buttonPause = GTK_TOOL_BUTTON(gtk_builder_get_object(builder, "toolbuttonPause"));
     buttonStop = GTK_TOOL_BUTTON(gtk_builder_get_object(builder, "toolbuttonStop"));
     volumeButton = GTK_VOLUME_BUTTON(gtk_builder_get_object(builder, "volumebutton"));
-
+    seek_cb_signal = g_signal_connect (G_OBJECT (hScale), "value-changed", G_CALLBACK (seek_cb), NULL);
+    g_signal_connect (G_OBJECT (hScale), "button-press-event", G_CALLBACK (slider_button_press_cb), NULL);
+    g_signal_connect (G_OBJECT (hScale), "button-release-event", G_CALLBACK (slider_button_release_cb), NULL);
     gtk_builder_connect_signals(builder, NULL);
 
     g_object_unref(G_OBJECT(builder));
 
     gtk_widget_show_all(window);
-    g_timeout_add(1000, changeScroll, NULL);
+  //  g_timeout_add(1, changeScroll, NULL);
+   duration = GST_CLOCK_TIME_NONE;
     gtk_main();
-
+    gst_element_set_state (pipeline, GST_STATE_NULL);
+    gst_object_unref (pipeline);
     return 0;
 }
 

@@ -9,13 +9,14 @@
 
 
 
+
 void
 seek_cb (GtkRange *range,
          GtkScrollType scroll,
          gdouble value,
          gpointer data)
 {
-    gint64 to_seek;
+    /*gint64 to_seek;
 
     if (!DURATION_IS_VALID (duration))
         duration = gst_query_duration ();
@@ -26,7 +27,10 @@ seek_cb (GtkRange *range,
     to_seek = (value / 100) * duration;
 
 
-   gst_seek_absolute (to_seek);
+   gst_seek_absolute (to_seek);*/
+   value = gtk_range_get_value (GTK_RANGE (hScale));
+
+   gst_element_seek_simple (pipeline, GST_FORMAT_TIME, GST_SEEK_FLAG_FLUSH | GST_SEEK_FLAG_KEY_UNIT,(gint64)(value * GST_SECOND));
 }
 
 
@@ -59,6 +63,25 @@ on_open_activate ( GtkMenuItem *item,gpointer data) {
         gst_play_main();
 }
 
+gboolean slider_button_press_cb(GtkWidget * widget, GdkEventButton * event, gpointer user_data)
+{
+	if (event->button == 1)
+        event->button = 2;
+	
+	return FALSE;
+}
+
+gboolean slider_button_release_cb(GtkWidget * widget, GdkEventButton * event, gpointer user_data)
+{
+    if (event->button == 1)
+        event->button = 2;
+    gst_element_set_state(pipeline, GST_STATE_PAUSED);
+    gst_element_set_state(pipeline, GST_STATE_PLAYING);
+    return FALSE;
+}
+
+
+
 void
 toggle_paused ()
 {
@@ -80,41 +103,16 @@ toggle_paused ()
 void
 change_volume(GtkScaleButton *button,gdouble value,gpointer data)
 {
-	FILE *cmd;
-	gint exit_status;
 	gdouble val = gtk_scale_button_get_value(button);
-	gchar *command = "/usr/bin/amixer sset Master ";
-	command = g_strdup_printf ("%s %d\%", command,(int)(val*100));
-	cmd = popen(command,"r");
-    exit_status = pclose (cmd);
+	g_object_set(volume,"volume",(val)/10,NULL);
 }	
-void 
-setCurrentVol(GtkWidget *widget,gpointer data) {
-	FILE *cmd;
-	char path[4];
-	
-	gchar *command = "amixer get Master | egrep -o -e \"[0-9][0-9][0-9]%|[0-9][0-9]%|[0-9]%\" | cut -d '%' -f1";
-	cmd = popen(command,"r");
-	fgets(path, 10, cmd);
-    int val = atoi(path);
-    g_print("%d",val);
-    gtk_scale_button_set_value(GTK_SCALE_BUTTON(volumeButton),val);
-	cmd = popen(command,"r");
-	fgets(path, 10, cmd);
-    val = atoi(path);
-    g_print("%d",val);
-
-}
 
 gboolean
 key_press (GtkWidget *widget,
            GdkEventKey *event,
            gpointer data)
 {
-	
-	gchar *name = gdk_keyval_name(event->keyval);
-	g_print("%s",name);
-	
+    gchar *name = gdk_keyval_name(event->keyval);	
     switch (event->keyval)
     {
         case GDK_P:
@@ -122,11 +120,6 @@ key_press (GtkWidget *widget,
         case GDK_space:
             toggle_paused ();
             break;
-        case GDK_F:
-        case GDK_f:
-      //      toggle_fullscreen ();
-            break;
-        case GDK_R:
         case GDK_r:
             gst_seek(0);
             break;
@@ -140,17 +133,79 @@ key_press (GtkWidget *widget,
         case GDK_q:
             gtk_main_quit ();
             break;
+	case GDK_f:
+	case GDK_Alt_L + GDK_Return:
+    		if ((gdk_window_get_state(GDK_WINDOW(widget->window)) == GDK_WINDOW_STATE_FULLSCREEN)) 
+		{
+			gtk_window_unfullscreen(GTK_WINDOW(widget));
+			gtk_widget_set_visible(vBoxBottom,TRUE);
+		}
+         	else
+		{
+        		gtk_window_fullscreen(GTK_WINDOW(widget));
+			gtk_widget_set_visible(vBoxBottom,FALSE);
+		}
+	break;
         default:
             break;
     }
 
     return TRUE;
 }
-gboolean
+
+/*void
+refresh_ui() {
+
+    gint64 duration;
+    GstState state;
+    GstFormat fmt = GST_FORMAT_TIME;
+    if(pipeline) {
+        gst_element_get_state(pipeline, &state, NULL, GST_CLOCK_TIME_NONE);
+        if(state<GST_STATE_PAUSED){
+            gst_element_query_duration (pipeline, &fmt, &duration);
+            g_print("Duration = %d",duration);
+	    if(duration>0)
+            gtk_range_set_range (GTK_RANGE (hScale), 0, (gdouble)duration / GST_SECOND);
+        }
+    }
+}*/
+
+gboolean refresh_ui (gpointer data) {
+  GstFormat fmt = GST_FORMAT_TIME;
+  gint64 current = -1;
+  
+  GstState state;
+  gst_element_get_state(pipeline, &state, NULL, GST_CLOCK_TIME_NONE);
+  /* We do not want to update anything unless we are in the PAUSED or PLAYING states */
+  if (state < GST_STATE_PAUSED)
+    return TRUE;
+  /* If we didn't know it yet, query the stream duration */
+  if (!GST_CLOCK_TIME_IS_VALID (duration)) {
+    if (!gst_element_query_duration (pipeline, &fmt, &duration)) {
+      g_printerr ("Could not query current duration.\n");
+    } else {
+      /* Set the range of the slider to the clip duration, in SECONDS */
+      gtk_range_set_range (GTK_RANGE (hScale), 0, (gdouble)duration / GST_SECOND);
+    }
+  }
+  
+  if (gst_element_query_position (pipeline, &fmt, &current)) {
+    /* Block the "value-changed" signal, so the slider_cb function is not called
+     * (which would trigger a seek the user has not requested) */
+    g_signal_handler_block (hScale, seek_cb_signal);
+    /* Set the position of the slider to the current pipeline positoin, in SECONDS */
+    gtk_range_set_value (GTK_RANGE (hScale), (gdouble)current / GST_SECOND);
+    /* Re-enable the signal */
+    g_signal_handler_unblock (hScale, seek_cb_signal);
+  }
+  return TRUE;
+}
+
+/*gboolean
 changeScroll (gpointer data)
 {
     gint64 pos;
-	if(pipeline) {
+    if(pipeline) {
     pos = gst_query_position ();
     if (!DURATION_IS_VALID (duration))
         duration = gst_query_duration ();
@@ -158,7 +213,7 @@ changeScroll (gpointer data)
     if (!DURATION_IS_VALID (duration))
         return TRUE;
 	
-    /** @todo use events for seeking instead of checking for bad positions. */
+   // ** @todo use events for seeking instead of checking for bad positions. *
     if (pos != 0)
     {
         double value;
@@ -168,7 +223,7 @@ changeScroll (gpointer data)
 	}
     return TRUE;
 }
-
+*/
 void
 gst_stop (GtkWidget *widget,gpointer data)
 {
