@@ -1,7 +1,8 @@
 #include <gtk/gtk.h>
 #include <gst/gst.h>
 #include <glib.h>
-#include <gst/interfaces/xoverlay.h>
+#include <gst/video/video.h>
+#include <gst/video/videooverlay.h>
 #include <gdk/gdkx.h>
 #include <gdk/gdkkeysyms.h>
 
@@ -44,6 +45,7 @@ void
 on_open_activate ( GtkMenuItem *item,gpointer data) {
 	GtkWidget               *chooser;           
 	
+	printf("asd");
     chooser = gtk_file_chooser_dialog_new ("Open File...",
                                                GTK_WINDOW (window),
                                                GTK_FILE_CHOOSER_ACTION_OPEN,
@@ -181,7 +183,7 @@ gboolean refresh_ui (gpointer data) {
     return TRUE;
   /* If we didn't know it yet, query the stream duration */
   if (!GST_CLOCK_TIME_IS_VALID (duration)) {
-    if (!gst_element_query_duration (pipeline, &fmt, &duration)) {
+    if (!gst_element_query_duration (pipeline, fmt, &duration)) {
       g_printerr ("Could not query current duration.\n");
     } else {
       /* Set the range of the slider to the clip duration, in SECONDS */
@@ -189,7 +191,7 @@ gboolean refresh_ui (gpointer data) {
     }
   }
   
-  if (gst_element_query_position (pipeline, &fmt, &current)) {
+  if (gst_element_query_position (pipeline, fmt, &current)) {
     /* Block the "value-changed" signal, so the slider_cb function is not called
      * (which would trigger a seek the user has not requested) */
     g_signal_handler_block (hScale, seek_cb_signal);

@@ -42,51 +42,26 @@ static int mutex;
 
 
 #define DURATION_IS_VALID(x) (x != 0 && x != (guint64) -1)
-void
-seek_cb (GtkRange *range,
-         GtkScrollType scroll,
-         gdouble value,
-         gpointer data);
-void 
-on_window_destroy (GtkObject *object, gpointer user_data);
-void
-on_open_activate ( GtkMenuItem *item,gpointer data);
-void
-toggle_paused ();
-void
-change_volume(GtkScaleButton *button,gdouble value,gpointer data);	
-gboolean
-key_press (GtkWidget *widget,
-           GdkEventKey *event,
-           gpointer data);
-gboolean
-changeScroll (gpointer data);
-void
-gst_stop (GtkWidget *widget,gpointer data);
+void seek_cb (GtkRange *range, GtkScrollType scroll,  gdouble value,  gpointer data);
+void on_window_destroy (GtkObject *object, gpointer user_data);
+void on_open_activate ( GtkMenuItem *item,gpointer data);
+void toggle_paused ();
+void change_volume(GtkScaleButton *button,gdouble value,gpointer data);	
+gboolean key_press (GtkWidget *widget, GdkEventKey *event, gpointer data);
+gboolean changeScroll (gpointer data);
+void gst_stop (GtkWidget *widget,gpointer data);
 
-void
-gst_pause (GtkWidget *widget,gpointer data);
+void gst_pause (GtkWidget *widget,gpointer data);
 
-void
-gst_play (GtkWidget *widget,gpointer data);
+void gst_play (GtkWidget *widget,gpointer data);
 
-gboolean
-bus_call (GstBus     *bus,
-          GstMessage *msg,
-          gpointer    data);
-void
-gst_play_main();
-void
-gst_seek_absolute (guint64 value);
-void
-gst_seek (gint value);
-
-guint64
-gst_query_duration (void);
-guint64
-gst_query_position (void);
-static void
-cb_newpad (GstElement *decodebin,GstPad     *pad,gboolean    last, gpointer    data);
+gboolean bus_call (GstBus     *bus,GstMessage *msg, gpointer    data);
+void gst_play_main();
+void gst_seek_absolute (guint64 value);
+void gst_seek (gint value);
+guint64 gst_query_duration (void);
+guint64 gst_query_position (void);
+static void cb_newpad (GstElement *decodebin,GstPad     *pad,gboolean    last, gpointer    data);
 gboolean refresh_ui(gpointer data);
 gulong seek_cb_signal;
 gboolean slider_button_press_cb(GtkWidget * widget, GdkEventButton * event, gpointer user_data);

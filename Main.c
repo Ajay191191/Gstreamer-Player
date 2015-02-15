@@ -1,7 +1,8 @@
 #include <gtk/gtk.h>
 #include <gst/gst.h>
 #include <glib.h>
-#include <gst/interfaces/xoverlay.h>
+#include <gst/video/video.h>
+#include <gst/video/videooverlay.h>
 #include <gdk/gdkx.h>
 #include <gdk/gdkkeysyms.h>
 
